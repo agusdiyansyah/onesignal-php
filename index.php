@@ -16,8 +16,18 @@ $notifikasi = array(
     ),
 );
 
+$opsi = array(
+    // "segment" => array("All"),
+    "playerId" => array(
+        "7157462d-4375-47e5-ad54-d84b3a03a3f3", 
+        "57b4e40c-b5da-4468-a960-b7b06eebba3c"
+    )
+);
+
 $os
 ->init($opt)
-->send($notifikasi)
+->notification($notifikasi)
+->option($opsi)
+->send()
 ->log()
 ?>

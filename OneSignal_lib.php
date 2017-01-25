@@ -7,21 +7,67 @@ class OneSignal {
     protected $restApiKey = "";
 
     // Notification
+    protected $title = array();
+    protected $content = array();
+    
+    // option
+    protected $segment = array();
     protected $playerId = array();
-    protected $title = "";
-    protected $content = "";
-
+    
     protected $response = "";
     protected $log = "";
 
     public function init ($opt = array()) {
         if (!empty($opt['appId'])) {
             $this->appId = $opt['appId'];
+        } else {
+            $this->setLog("", "App Id tidak boleh kosong");
         }
 
         if (!empty($opt['restApiKey'])) {
             $this->restApiKey = $opt['restApiKey'];
+        } else {
+            $this->setLog("", "Rest Api Key tidak boleh kosong");
         }
+        return $this;
+    }
+    
+    public function notification ($init = array()) {
+        if (empty($init['content']) OR count($init['content']) == 0) {
+            $this->setLog("ERROR", "Content tidak boleh kosong");
+        } elseif (empty($init['title']) OR count($init['title']) == 0) {
+            $this->setLog("ERROR", "Title tidak boleh kosong");
+        } elseif (empty($init['content']['en'])) {
+            $this->setLog("ERROR", "Content EN tidak boleh kosong");
+        } elseif (empty($init['title']['en'])) {
+            $this->setLog("ERROR", "Title EN tidak boleh kosong");
+        } else {
+            $this->title = $init['title'];
+            $this->content = $init['content'];
+        }
+        return $this;
+    }
+    
+    public function option ($init = array()) {
+        $valid = false;
+        if (!empty($init['segment']) AND !empty($init['playerId'])) {
+            $this->setLog("ERROR", "Anda harus memilih 'Segment' atau 'Player Id'");
+        } elseif (empty($init['segment']) AND empty($init['playerId'])) {
+            $this->setLog("ERROR", "Segment tidak boleh kosong");
+        } else {
+            $valid = true;
+        }
+        
+        if ($valid) {
+            if (!empty($init['segment'])) {
+                $this->segment = $init['segment'];
+            }
+            
+            if (!empty($init['playerId'])) {
+                $this->playerId = $init['playerId'];
+            }
+        }
+        
         return $this;
     }
 
@@ -29,24 +75,33 @@ class OneSignal {
      * Send notification
      * @return [type] [description]
      */
-    public function send ($opt = array()) {
-
-        if (empty($opt['content']) OR count($opt['content']) == 0) {
-            $this->setLog("", "Content tidak boleh kosong");
-        } elseif (empty($opt['title']) OR count($opt['title']) == 0) {
-            $this->setLog("", "Title tidak boleh kosong");
-        } elseif (empty($opt['content']['en'])) {
-            $this->setLog("", "Content EN tidak boleh kosong");
-        } elseif (empty($opt['title']['en'])) {
-            $this->setLog("", "Title EN tidak boleh kosong");
+    public function send () {
+        $valid = false;
+        
+        if (count($this->title) == 0 OR count($this->content) == 0) {
+            $this->setLog("ERROR", "Notifikasi tidak di setting dengan benar");
         } else {
+            $valid = true;
+        }
+        
+        if ($valid) {
             $body = array(
     			"app_id" => $this->appId,
-    			"included_segments" => array("All"),
-                "data" => array("foo" => "bar"),
-                "headings" => $opt["title"],
-    			"contents" => $opt["content"],
+                "headings" => $this->title,
+    			"contents" => $this->content,
+                // "image" => 'https://domain.com/background_image.jpg',
+                // "headings_color" => "FFFF0000",
+                // "contents_color" => "FF00FF00",
+                
     		);
+            
+            if (count($this->segment) > 0) {
+                $body += array("included_segments" => $this->segment);
+            }
+            
+            if (count($this->playerId) > 0) {
+                $body += array("include_player_ids" => $this->playerId);
+            }
 
             $body = json_encode($body);
 
@@ -79,7 +134,6 @@ class OneSignal {
     }
 
     protected function json($json) {
-        header("Content-Type: application/json");
         if (!is_string($json)) {
             if (phpversion() && phpversion() >= 5.4) {
                 return json_encode($json, JSON_PRETTY_PRINT);
@@ -145,6 +199,7 @@ class OneSignal {
     }
 
     protected function setlog ($title = "", $content) {
+        header("Content-Type: application/json");
         if ($title != "") {
             $this->log .= "==================================\n$title\n==================================\n";
         }
