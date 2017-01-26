@@ -16,6 +16,7 @@ class OneSignal {
     
     protected $response = "";
     protected $log = "";
+    protected $option = array();
 
     public function init ($opt = array()) {
         if (!empty($opt['appId'])) {
@@ -49,24 +50,7 @@ class OneSignal {
     }
     
     public function option ($init = array()) {
-        $valid = false;
-        if (!empty($init['segment']) AND !empty($init['playerId'])) {
-            $this->setLog("ERROR", "Anda harus memilih 'Segment' atau 'Player Id'");
-        } elseif (empty($init['segment']) AND empty($init['playerId'])) {
-            $this->setLog("ERROR", "Segment tidak boleh kosong");
-        } else {
-            $valid = true;
-        }
-        
-        if ($valid) {
-            if (!empty($init['segment'])) {
-                $this->segment = $init['segment'];
-            }
-            
-            if (!empty($init['playerId'])) {
-                $this->playerId = $init['playerId'];
-            }
-        }
+        $this->option = $init;
         
         return $this;
     }
@@ -89,18 +73,10 @@ class OneSignal {
     			"app_id" => $this->appId,
                 "headings" => $this->title,
     			"contents" => $this->content,
-                // "image" => 'https://domain.com/background_image.jpg',
-                // "headings_color" => "FFFF0000",
-                // "contents_color" => "FF00FF00",
-                
     		);
             
-            if (count($this->segment) > 0) {
-                $body += array("included_segments" => $this->segment);
-            }
-            
-            if (count($this->playerId) > 0) {
-                $body += array("include_player_ids" => $this->playerId);
+            if (count($this->option) > 0) {
+                $body += $this->option;
             }
 
             $body = json_encode($body);

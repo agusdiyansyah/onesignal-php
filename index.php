@@ -17,17 +17,19 @@ $notifikasi = array(
 );
 
 $opsi = array(
-    // "segment" => array("All"),
-    "playerId" => array(
-        "7157462d-4375-47e5-ad54-d84b3a03a3f3", 
-        "57b4e40c-b5da-4468-a960-b7b06eebba3c"
-    )
+    
 );
 
-$os
-->init($opt)
-->notification($notifikasi)
+$os->init($opt);
+$os->notification($notifikasi)
 ->option($opsi)
 ->send()
 ->log()
 ?>
+
+<!-- 
+included_segments
+    kirim ke semua player dengan segment yang sama
+include_player_ids
+    kirim ke semu aplayer yang terdaftar di player ids
+-->
