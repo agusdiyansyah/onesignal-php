@@ -17,7 +17,10 @@ $notifikasi = array(
 );
 
 $opsi = array(
-    
+    // "include_player_ids" => array("57b4e40c-b5da-4468-a960-b7b06eebba3c"),
+    "included_segments" => array("All"),
+    "url" => "http://indobit.com",
+    "android_led_color" => "#f44336"
 );
 
 $os->init($opt);
@@ -27,7 +30,7 @@ $os->notification($notifikasi)
 ->log()
 ?>
 
-<!-- 
+<!--
 included_segments
     kirim ke semua player dengan segment yang sama
 include_player_ids
